@@ -21,3 +21,6 @@ class Fibre(object):
         total_nucleosome_dna_length = self.NUCLEOSOME_LENGTH * self.n_nucleosomes
         linker_dna_length = self.left_linker + self.right_linker
         return total_nucleosome_dna_length + linker_dna_length
+
+    def __repr__(self):
+        return f"Fibre({self.n_nucleosomes}, {self.LINKER_LENGTH}, {self.NUCLEOSOME_LENGTH})"
