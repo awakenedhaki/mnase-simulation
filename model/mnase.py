@@ -43,6 +43,22 @@ class MNase(object):
         return randint(0, 1)
 
     @staticmethod
+    def choose_nth_nucleotide(length: int) -> int:
+        return randint(0, length)
+
+    @staticmethod
+    def remove_n_nucleotides(length: int) -> int:
+        """Removes a random number of nucleotides from a given length.
+
+        Args:
+            length (int): The length of the nucleotide sequence.
+
+        Returns:
+            int: The number of nucleotides to be removed.
+        """
+        return randint(1, length)
+
+    @staticmethod
     def cleave_fibre(
         fibre: Fibre, nucleosome: int, linker: Literal[0, 1]
     ) -> Tuple[Optional[Fibre], Optional[Fibre]]:
