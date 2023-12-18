@@ -21,7 +21,7 @@ class MNase(object):
         """Randomly chooses a linker.
 
         Returns:
-            Literal[0, 1]: The randomly chosen linker, either 0 (left) or 1 (right).
+            Literal[0, 1]: The randomly chosen linker, either 0 (right) or 1 (left).
         """
         return randint(0, 1)
 
@@ -34,8 +34,7 @@ class MNase(object):
         Args:
             fibre (Fibre): The fibre to be cleaved.
             nucleosome (int): The position of the nucleosome to cleave at.
-            linker (Literal[0, 1]): The chosen linker, either 0 (left)
-                or 1 (right).
+            linker (Literal[0, 1]): The chosen linker, either 0 (right) or 1 (left).
 
         Returns:
             Tuple[Optional[Fibre], Optional[Fibre]]: A tuple containing the
