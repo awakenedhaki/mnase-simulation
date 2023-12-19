@@ -35,7 +35,7 @@ def main():
             fibres[id(fibre_before)] = fibre_before
             fibres[id(fibre_after)] = fibre_after
 
-            if not id(fibre_before) == selected_fibre):
+            if not id(fibre_before) == selected_fibre:
                 del fibres[id(fibre_before)]
             elif not id(fibre_after) == selected_fibre:
                 del fibres[id(fibre_after)]
