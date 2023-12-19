@@ -25,21 +25,21 @@ class Fibre(object):
 
     def get_linker(self, index: int):
         if index == 0:
-            return self.right_linker
-        elif index == 1:
             return self.left_linker
+        elif index == 1:
+            return self.right_linker
 
     def set_linker(self, index: int, length: int):
         if index == 0:
-            self.right_linker = length
-        elif index == 1:
             self.left_linker = length
+        elif index == 1:
+            self.right_linker = length
 
     def set_opposing_linker(self, index: int, length: int):
         if index == 0:
-            self.left_linker = length
-        elif index == 1:
             self.right_linker = length
+        elif index == 1:
+            self.left_linker = length
 
     def __repr__(self):
         return f"Fibre({self.n_nucleosomes}, {self.LINKER_LENGTH}, {self.NUCLEOSOME_LENGTH})"

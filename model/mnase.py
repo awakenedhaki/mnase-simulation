@@ -38,7 +38,7 @@ class MNase(object):
         """Randomly chooses a linker.
 
         Returns:
-            Literal[0, 1]: The randomly chosen linker, either 0 (right) or 1 (left).
+            Literal[0, 1]: The randomly chosen linker, either 0 (left) or 1 (right).
         """
         return randint(0, 1)
 
@@ -67,7 +67,7 @@ class MNase(object):
         Args:
             fibre (Fibre): The fibre to be cleaved.
             nucleosome (int): The position of the nucleosome to cleave at.
-            linker (Literal[0, 1]): The chosen linker, either 0 (right) or 1 (left).
+            linker (Literal[0, 1]): The chosen linker, either 0 (left) or 1 (right).
 
         Returns:
             Tuple[Optional[Fibre], Optional[Fibre]]: A tuple containing the
@@ -76,12 +76,12 @@ class MNase(object):
                 after the cleavage position.
 
                 Special cases:
-                    1. nucleosome <= 0      & linker == 1 -> (None, Fibre)
-                    2. nucleosome >= length & linker == 0 -> (Fibre, None)
+                    1. nucleosome <= 0      & linker == 0 -> (Fibre, None)
+                    2. nucleosome >= length & linker == 1 -> (None, Fibre)
         """
-        if nucleosome <= 0 and linker == 1:
+        if nucleosome <= 0 and linker == 0:
             output = _cleave_terminal_linker(fibre, linker)
-        elif nucleosome >= fibre.n_nucleosomes and linker == 0:
+        elif nucleosome >= fibre.n_nucleosomes and linker == 1:
             output = _cleave_terminal_linker(fibre, linker)
         elif fibre.n_nucleosomes == 1:
             output = _cleave_terminal_linker(fibre, linker)
@@ -99,7 +99,7 @@ def _cleave_fibre(
     Args:
         fibre (Fibre): The fibre to be cleaved.
         nucleosomes (int): The number of nucleosomes.
-        linker (Literal[0, 1]): The chosen linker, either 0 (right) or 1 (left).
+        linker (Literal[0, 1]): The chosen linker, either 0 (left) or 1 (right).
 
     Returns:
         Tuple[Fibre, Fibre]: A tuple containing the two resulting fibres.
@@ -129,12 +129,12 @@ def _cleave_terminal_linker(
 
     Args:
         fibre (Fibre): The fibre to cleave the linker from.
-        linker (Literal[0, 1]): The chosen linker, either 0 (right) or 1 (left).
+        linker (Literal[0, 1]): The chosen linker, either 0 (left) or 1 (right).
 
     Returns:
         Tuple[Optional[Fibre], Optional[Fibre]]: A tuple containing the modified fibre(s).
-        If linker is 0, the right linker is cleaved and the modified fibre is returned as the second element of the tuple.
-        If linker is 1, the left linker is cleaved and the modified fibre is returned as the first element of the tuple.
+        If linker is 0, the left linker is cleaved and the modified fibre is returned as the first element of the tuple.
+        If linker is 1, the right linker is cleaved and the modified fibre is returned as the second element of the tuple.
     """
     output = [None, None]
     linker_length = fibre.get_linker(linker)
