@@ -1,25 +1,20 @@
 from model import Fibre
-from random import randint
-from typing import Literal, Tuple, Optional, List
+from random import randint, choice
+from typing import Literal, Tuple, Optional
 
 
 class MNase(object):
     @staticmethod
-    def choose_fibre(fibres: List[Fibre]) -> int:
-        """
-        Chooses a random fibre from the given list of fibres.
+        def choose_fibre(fibres: Tuple[int]) -> int:
+            """Chooses a fibre from the given tuple of fibres.
 
-        Args:
-            fibres (List[Fibre]): A list of fibres to choose from.
+            Args:
+                fibres (Tuple[int]): A tuple of integers representing the available fibres.
 
-        Returns:
-            int: The index of the chosen fibre.
-
-        Raises:
-            IndexError: If the list of fibres is empty.
-        """
-        remove_nones = [fibre for fibre in fibres if fibre is not None]
-        return randint(0, len(remove_nones) - 1)
+            Returns:
+                int: The chosen fibre.
+            """
+            return choice(fibres)
 
     @staticmethod
     def choose_nucleosome(length: int) -> int:
