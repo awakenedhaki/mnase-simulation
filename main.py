@@ -12,7 +12,7 @@ def main():
     fibres[0] = Fibre(N_NUCLEOSOMES, LINKER_LENGTH, NUCLEOSOME_LENGTH)
 
     # Initialize model
-    for i, _ in enumerate(range(TIME_STEPS)):
+    for _ in range(TIME_STEPS):
         # Select which fibre to cleave
         selected_fibre = MNase.choose_fibre(fibres)
         fibre = fibres[selected_fibre]
