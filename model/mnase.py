@@ -5,16 +5,16 @@ from typing import Literal, Tuple, Optional
 
 class MNase(object):
     @staticmethod
-        def choose_fibre(fibres: Tuple[int]) -> int:
-            """Chooses a fibre from the given tuple of fibres.
+    def choose_fibre(fibres: Tuple[int]) -> int:
+        """Chooses a fibre from the given tuple of fibres.
 
-            Args:
-                fibres (Tuple[int]): A tuple of integers representing the available fibres.
+        Args:
+            fibres (Tuple[int]): A tuple of integers representing the available fibres.
 
-            Returns:
-                int: The chosen fibre.
-            """
-            return choice(fibres)
+        Returns:
+            int: The chosen fibre.
+        """
+        return choice(fibres)
 
     @staticmethod
     def choose_nucleosome(length: int) -> int:
