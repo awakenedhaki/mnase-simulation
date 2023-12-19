@@ -1,8 +1,11 @@
 from typing import Literal
+from model.validators import validate_fibre_input
 
 
 class Fibre(object):
     def __init__(self, n_nucleosomes: int, linker_length: int, nucleosome_length: int):
+        validate_fibre_input(n_nucleosomes, linker_length, nucleosome_length)
+
         # Constants
         self.LINKER_LENGTH = linker_length
         self.NUCLEOSOME_LENGTH = nucleosome_length
