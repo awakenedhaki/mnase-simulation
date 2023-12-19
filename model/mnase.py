@@ -136,15 +136,15 @@ def _cleave_terminal_linker(
         If linker is 0, the right linker is cleaved and the modified fibre is returned as the second element of the tuple.
         If linker is 1, the left linker is cleaved and the modified fibre is returned as the first element of the tuple.
     """
-    linker_length = fibre.left_linker if linker == 0 else fibre.right_linker
-    n_nucleotides_removed = _remove_n_nucleotides(linker_length)
-
-    output = (None, None)
-    if linker == 0:
-        fibre.right_linker -= n_nucleotides_removed
-        output = (None, fibre)
+    output = [None, None]
+    linker_length = fibre.get_linker(linker)
+    if linker_length <= 0:
+        output[linker] = fibre
     else:
-        fibre.left_linker -= n_nucleotides_removed
-        output = (fibre, None)
+        n_nucleotides_removed = MNase.remove_n_nucleotides(linker_length)
+        if linker_length < n_nucleotides_removed:
+            n_nucleotides_removed = linker_length
 
-    return output
+        fibre.set_linker(linker, linker_length - n_nucleotides_removed)
+        output[linker] = fibre
+    return tuple(output)
