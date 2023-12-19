@@ -82,11 +82,7 @@ class MNase(object):
                     1. nucleosome <= 0      & linker == 0 -> (Fibre, None)
                     2. nucleosome >= length & linker == 1 -> (None, Fibre)
         """
-        if (
-            (fibre.n_nucleosomes == 1)
-            or (nucleosome <= 0 and linker == 0)
-            or (nucleosome >= fibre.n_nucleosomes and linker == 1)
-        ):
+        if (fibre.n_nucleosomes == 1) or _is_terminal_linker(fibre, nucleosome, linker):
             output = _cleave_terminal_linker(fibre, linker)
         else:
             nucleosome = _adjust_nucleosome(fibre, nucleosome, linker)
@@ -112,6 +108,52 @@ def _adjust_nucleosome(fibre: Fibre, nucleosome: int, linker: Literal[0, 1]) -> 
     else:
         adjusted_nucleosome = nucleosome
     return adjusted_nucleosome
+
+
+def _is_terminal_linker(fibre: Fibre, nucleosome: int, linker: Literal[0, 1]) -> bool:
+    """Determines if a linker is a terminal linker in a given nucleosome.
+
+    Args:
+        fibre (Fibre): The fibre object.
+        nucleosome (int): The index of the nucleosome.
+        linker (Literal[0, 1]): The chosen linker, either 0 (left) or 1 (right).
+
+    Returns:
+        bool: True if the linker is a terminal linker, False otherwise.
+    """
+    return _is_terminal_left_linker(nucleosome, linker) or _is_terminal_right_linker(
+        fibre, nucleosome, linker
+    )
+
+
+def _is_terminal_left_linker(nucleosome: int, linker: Literal[0, 1]) -> bool:
+    """Checks if the given nucleosome is a terminal left linker.
+
+    Args:
+        nucleosome (int): The index of the nucleosome.
+        linker (Literal[0, 1]): The chosen linker, either 0 (left) or 1 (right).
+
+    Returns:
+        bool: True if the nucleosome is a terminal left linker, False otherwise.
+    """
+    return (nucleosome <= 0) and (linker == 0)
+
+
+def _is_terminal_right_linker(
+    fibre: Fibre, nucleosome: int, linker: Literal[0, 1]
+) -> bool:
+    """Checks if the given nucleosome is the last one in the fibre and if the linker is on the right side.
+
+    Args:
+        fibre (Fibre): The fibre object.
+        nucleosome (int): The index of the nucleosome.
+        linker (Literal[0, 1]): The chosen linker, either 0 (left) or 1 (right).
+
+    Returns:
+        bool: True if the nucleosome is the last one in the fibre and the linker
+            is on the right side, False otherwise.
+    """
+    return (nucleosome >= fibre.n_nucleosomes) and (linker == 1)
 
 
 def _cleave_fibre(
