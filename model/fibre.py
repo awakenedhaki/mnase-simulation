@@ -1,3 +1,6 @@
+from typing import Literal
+
+
 class Fibre(object):
     def __init__(self, n_nucleosomes: int, linker_length: int, nucleosome_length: int):
         # Constants
@@ -23,19 +26,42 @@ class Fibre(object):
         inner_linker_length = self.LINKER_LENGTH * (self.n_nucleosomes - 1)
         return nucleosome_length + terminal_linker_length + inner_linker_length
 
-    def get_linker(self, index: int):
+    def get_linker(self, index: Literal[0, 1]) -> int:
+        """Returns the linker value at the specified index.
+
+        Args:
+            index (Literal[0, 1]): The linker index, either 0 (left) or 1 (right).
+
+        Returns:
+            int: The linker value at the specified index.
+        """
         if index == 0:
             return self.left_linker
         elif index == 1:
             return self.right_linker
+        else:
+            raise ValueError("Invalid index. Must be either 0 or 1.")
 
-    def set_linker(self, index: int, length: int):
+    def set_linker(self, index: Literal[0, 1], length: int) -> None:
+        """Sets the length of the linker for the specified index.
+
+        Args:
+            index (Literal[0, 1]): The linker index, either 0 (left) or 1 (right).
+            length (int): The length of the linker to set.
+        """
         if index == 0:
             self.left_linker = length
         elif index == 1:
             self.right_linker = length
 
-    def set_opposing_linker(self, index: int, length: int):
+    def set_opposing_linker(self, index: Literal[0, 1], length: int) -> None:
+        """
+        Sets the length of the opposing linker based on the given index.
+
+        Args:
+            index (Literal[0, 1]): The linker index, either 0 (left) or 1 (right).
+            length (int): The length of the linker.
+        """
         if index == 0:
             self.right_linker = length
         elif index == 1:
