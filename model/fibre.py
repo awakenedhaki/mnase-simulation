@@ -18,9 +18,10 @@ class Fibre(object):
         Returns:
             int: The total number of nucleotides in the fibre.
         """
-        total_nucleosome_dna_length = self.NUCLEOSOME_LENGTH * self.n_nucleosomes
-        linker_dna_length = self.left_linker + self.right_linker
-        return total_nucleosome_dna_length + linker_dna_length
+        nucleosome_length = self.NUCLEOSOME_LENGTH * self.n_nucleosomes
+        terminal_linker_length = self.left_linker + self.right_linker
+        inner_linker_length = self.LINKER_LENGTH * (self.n_nucleosomes - 1)
+        return nucleosome_length + terminal_linker_length + inner_linker_length
 
     def __repr__(self):
         return f"Fibre({self.n_nucleosomes}, {self.LINKER_LENGTH}, {self.NUCLEOSOME_LENGTH})"
