@@ -102,36 +102,22 @@ def _cleave_fibre(
     Returns:
         Tuple[Fibre, Fibre]: A tuple containing the two resulting fibres.
     """
-    linker_length, n_nucleosomes = fibre.LINKER_LENGTH, fibre.n_nucleosomes
+    class_constants = {
+        "linker_length": fibre.LINKER_LENGTH,
+        "nucleosome_length": fibre.NUCLEOSOME_LENGTH,
+    }
 
-    # Calculating linker length
-    linker_length_1 = randint(1, linker_length)
-    linker_length_2 = linker_length - linker_length_1
+    cleavage_position = MNase.choose_nth_nucleotide(fibre.get_linker(linker))
 
-    shortest_length = min(linker_length_1, linker_length_2)
-    longest_length = max(linker_length_1, linker_length_2)
+    fibre_before = Fibre(nucleosomes, **class_constants)
+    fibre_before.set_linker(linker, cleavage_position)
 
-    # Calculating nucleosome number
-    nucleosomes_1 = nucleosomes
-    nucleosomes_2 = n_nucleosomes - nucleosomes
+    fibre_after = Fibre(fibre.n_nucleosomes - nucleosomes, **class_constants)
+    fibre_after.set_opposing_linker(
+        linker, fibre.get_linker(linker) - cleavage_position
+    )
 
-    lowest_nucleosomes = min(nucleosomes_1, nucleosomes_2)
-    highest_nucleosomes = max(nucleosomes_1, nucleosomes_2)
-
-    # Make output fibres
-    fibres = [None, None]
-    if linker == 0:
-        fibres[0] = Fibre(lowest_nucleosomes, linker_length, fibre.NUCLEOSOME_LENGTH)
-        fibres[0].right_linker = shortest_length
-        fibres[1] = Fibre(highest_nucleosomes, linker_length, fibre.NUCLEOSOME_LENGTH)
-        fibres[1].left_linker = longest_length
-    elif linker == 1:
-        fibres[0] = Fibre(highest_nucleosomes, linker_length, fibre.NUCLEOSOME_LENGTH)
-        fibres[0].right_linker = longest_length
-        fibres[1] = Fibre(lowest_nucleosomes, linker_length, fibre.NUCLEOSOME_LENGTH)
-        fibres[1].left_linker = shortest_length
-
-    return tuple(fibres)
+    return (fibre_before, fibre_after)
 
 
 def _cleave_terminal_linker(
