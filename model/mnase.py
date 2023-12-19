@@ -51,7 +51,7 @@ class MNase(object):
 
     @staticmethod
     def remove_n_nucleotides(length: int) -> int:
-        """Removes a random number of nucleotides from a given length.
+        """Choose a random number of nucleotides from a given length to remove.
 
         Args:
             length (int): The length of the nucleotide sequence.
