@@ -24,7 +24,7 @@ def validate_fibre_input(
         )
 
     if not all(
-        value > 0 for value in [n_nucleosomes, linker_length, nucleosome_length]
+        value >= 0 for value in [n_nucleosomes, linker_length, nucleosome_length]
     ):
         raise ValueError(
             "n_nucleosomes, linker_length, and nucleosome_length must be positive"
