@@ -3,7 +3,7 @@ from model import Fibre, MNase
 
 def main():
     TIME_STEPS = 10_000
-    N_NUCLEOSOMES = 10_00_000
+    N_NUCLEOSOMES = 10_000_000
     NUCLEOSOME_LENGTH = 147
     LINKER_LENGTH = 10
 
