@@ -89,18 +89,6 @@ class MNase(object):
         return output
 
 
-def _remove_n_nucleotides(length: int) -> int:
-    """Removes a random number of nucleotides from a given length.
-
-    Args:
-        length (int): The length of the nucleotide sequence.
-
-    Returns:
-        int: The number of nucleotides to be removed.
-    """
-    return randint(1, length)
-
-
 def _cleave_fibre(
     fibre: Fibre, nucleosomes: int, linker: Literal[0, 1]
 ) -> Tuple[Fibre, Fibre]:
