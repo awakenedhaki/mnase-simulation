@@ -42,4 +42,4 @@ class Fibre(object):
             self.left_linker = length
 
     def __repr__(self):
-        return f"Fibre({self.n_nucleosomes}, {self.LINKER_LENGTH}, {self.NUCLEOSOME_LENGTH})"
+        return f"ID: {id(self)}\tLeft: {self.left_linker}\tRight: {self.right_linker}\tNucleosomes: {self.n_nucleosomes}"
