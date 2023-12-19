@@ -76,8 +76,8 @@ class MNase(object):
                 after the cleavage position.
 
                 Special cases:
-                    1. nucleosome == 0      & linker == 0 -> (None, Fibre)
-                    2. nucleosome == length & linker == 1 -> (Fibre, None)
+                    1. nucleosome <= 0      & linker == 1 -> (None, Fibre)
+                    2. nucleosome >= length & linker == 0 -> (Fibre, None)
         """
         if nucleosome <= 0 and linker == 1:
             output = _cleave_terminal_linker(fibre, linker)
