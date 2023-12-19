@@ -79,16 +79,36 @@ class MNase(object):
                     1. nucleosome <= 0      & linker == 0 -> (Fibre, None)
                     2. nucleosome >= length & linker == 1 -> (None, Fibre)
         """
-        if nucleosome <= 0 and linker == 0:
-            output = _cleave_terminal_linker(fibre, linker)
-        elif nucleosome >= fibre.n_nucleosomes and linker == 1:
-            output = _cleave_terminal_linker(fibre, linker)
-        elif fibre.n_nucleosomes == 1:
+        if (
+            (fibre.n_nucleosomes == 1)
+            or (nucleosome <= 0 and linker == 0)
+            or (nucleosome >= fibre.n_nucleosomes and linker == 1)
+        ):
             output = _cleave_terminal_linker(fibre, linker)
         else:
+            nucleosome = _adjust_nucleosome(fibre, nucleosome, linker)
             output = _cleave_fibre(fibre, nucleosome, linker)
-
         return output
+
+
+def _adjust_nucleosome(fibre: Fibre, nucleosome: int, linker: Literal[0, 1]) -> int:
+    """Adjust the nucleosome position.
+
+    Args:
+        fibre (Fibre): The fibre to be cleaved.
+        nucleosome (int): The position of the nucleosome.
+        linker (Literal[0, 1]): The chosen linker, either 0 (left) or 1 (right).
+
+    Returns:
+        int: The adjusted nucleosome position.
+    """
+    if nucleosome <= 0 and linker == 1:
+        adjusted_nucleosome = nucleosome + 1
+    elif nucleosome >= fibre.n_nucleosomes and linker == 0:
+        adjusted_nucleosome = nucleosome - 1
+    else:
+        adjusted_nucleosome = nucleosome
+    return adjusted_nucleosome
 
 
 def _cleave_fibre(
