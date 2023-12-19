@@ -83,6 +83,8 @@ class MNase(object):
             output = _cleave_terminal_linker(fibre, linker)
         elif nucleosome >= fibre.n_nucleosomes and linker == 0:
             output = _cleave_terminal_linker(fibre, linker)
+        elif fibre.n_nucleosomes == 1:
+            output = _cleave_terminal_linker(fibre, linker)
         else:
             output = _cleave_fibre(fibre, nucleosome, linker)
 
