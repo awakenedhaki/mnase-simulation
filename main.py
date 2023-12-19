@@ -2,19 +2,19 @@ from model import Fibre, MNase
 
 
 def main():
-    TIME_STEPS = 25
-    N_NUCLEOSOMES = 1000
+    TIME_STEPS = 10_000
+    N_NUCLEOSOMES = 10_00_000
     NUCLEOSOME_LENGTH = 147
     LINKER_LENGTH = 10
 
     # Initialize fibre array
-    fibres = [None] * N_NUCLEOSOMES
-    fibres[0] = Fibre(N_NUCLEOSOMES, LINKER_LENGTH, NUCLEOSOME_LENGTH)
+    fibre = Fibre(N_NUCLEOSOMES, LINKER_LENGTH, NUCLEOSOME_LENGTH)
+    fibres = {id(fibre): fibre}
 
     # Initialize model
     for _ in range(TIME_STEPS):
         # Select which fibre to cleave
-        selected_fibre = MNase.choose_fibre(fibres)
+        selected_fibre = MNase.choose_fibre(tuple(fibres.keys()))
         fibre = fibres[selected_fibre]
 
         # Select which nucleosome to cleave
@@ -29,18 +29,20 @@ def main():
         )
 
         # Update fibre array
-        if any(fibre is not None for fibre in cleaved_products) and any(
-            fibre is None for fibre in fibres
-        ):
-            fibres[selected_fibre] = cleaved_products[0]
-            next_none_element_idx = next(
-                i for i, fibre in enumerate(fibres) if fibre is None
-            )
-            fibres[next_none_element_idx] = cleaved_products[1]
+        if all(fibre is not None for fibre in cleaved_products):
+            fibre_before = cleaved_products[0]
+            fibre_after = cleaved_products[1]
+            fibres[id(fibre_before)] = fibre_before
+            fibres[id(fibre_after)] = fibre_after
+
+            if not (
+                id(fibre_before) == selected_fibre or id(fibre_after) == selected_fibre
+            ):
+                del fibres[id(fibre_after)]
         elif fibre := next(filter(lambda x: x is not None, cleaved_products)):
             fibres[selected_fibre] = fibre
 
-    fibre_lengths = [fibre.n_nucleotides() for fibre in fibres if fibre is not None]
+    fibre_lengths = [fibre.n_nucleotides() for fibre in fibres.values()]
     return fibre_lengths
 
 
