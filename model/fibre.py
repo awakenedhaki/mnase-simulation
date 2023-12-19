@@ -34,6 +34,9 @@ class Fibre(object):
 
         Returns:
             int: The linker value at the specified index.
+
+        Raises:
+            ValueError: If the index is not 0 or 1.
         """
         if index == 0:
             return self.left_linker
@@ -48,11 +51,16 @@ class Fibre(object):
         Args:
             index (Literal[0, 1]): The linker index, either 0 (left) or 1 (right).
             length (int): The length of the linker to set.
+
+        Raises:
+            ValueError: If the index is not 0 or 1.
         """
         if index == 0:
             self.left_linker = length
         elif index == 1:
             self.right_linker = length
+        else:
+            raise ValueError("Invalid index. Must be either 0 or 1.")
 
     def set_opposing_linker(self, index: Literal[0, 1], length: int) -> None:
         """
@@ -61,11 +69,16 @@ class Fibre(object):
         Args:
             index (Literal[0, 1]): The linker index, either 0 (left) or 1 (right).
             length (int): The length of the linker.
+
+        Raises:
+            ValueError: If the index is not 0 or 1.
         """
         if index == 0:
             self.right_linker = length
         elif index == 1:
             self.left_linker = length
+        else:
+            raise ValueError("Invalid index. Must be either 0 or 1.")
 
     def __repr__(self):
         return f"ID: {id(self)}\tLeft: {self.left_linker}\tRight: {self.right_linker}\tNucleosomes: {self.n_nucleosomes}"
