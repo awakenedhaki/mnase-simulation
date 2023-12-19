@@ -39,6 +39,14 @@ class MNase(object):
 
     @staticmethod
     def choose_nth_nucleotide(length: int) -> int:
+        """Chooses a random index within the given length.
+
+        Args:
+            length (int): The length of the sequence.
+
+        Returns:
+            int: The randomly chosen index.
+        """
         return randint(0, length)
 
     @staticmethod
