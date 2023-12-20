@@ -28,6 +28,7 @@ def main(time_steps, n_nucleosomes, nucleosome_length, linker_length):
         if all(fibre is not None for fibre in cleaved_products):
             fibre_before = cleaved_products[0]
             fibre_after = cleaved_products[1]
+
             fibres[id(fibre_before)] = fibre_before
             fibres[id(fibre_after)] = fibre_after
 
