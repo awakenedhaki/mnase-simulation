@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from model import Fibre, MNase
 
 
@@ -12,7 +13,7 @@ def main():
     fibres = {id(fibre): fibre}
 
     # Initialize model
-    for _ in range(TIME_STEPS):
+    for _ in tqdm(range(time_steps)):
         # Select which fibre to cleave
         selected_fibre = MNase.choose_fibre(tuple(fibres.keys()))
         fibre = fibres[selected_fibre]
