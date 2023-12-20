@@ -2,14 +2,9 @@ from tqdm import tqdm
 from model import Fibre, MNase
 
 
-def main():
-    TIME_STEPS = 10_000
-    N_NUCLEOSOMES = 10_000_000
-    NUCLEOSOME_LENGTH = 147
-    LINKER_LENGTH = 10
-
+def main(time_steps, n_nucleosomes, nucleosome_length, linker_length):
     # Initialize fibre array
-    fibre = Fibre(N_NUCLEOSOMES, LINKER_LENGTH, NUCLEOSOME_LENGTH)
+    fibre = Fibre(n_nucleosomes, linker_length, nucleosome_length)
     fibres = {id(fibre): fibre}
 
     # Initialize model
@@ -48,4 +43,10 @@ def main():
 
 
 if __name__ == "__main__":
-    print("\n", main())
+    time_steps = 1_000
+    n_nucleosomes = 10_000
+    nucleosome_length = 147
+    linker_length = 20
+
+    lengths = main(time_steps, n_nucleosomes, nucleosome_length, linker_length)
+    print(lengths)
