@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 from tqdm import tqdm
 from model import Fibre, MNase
 
@@ -44,10 +45,19 @@ def main(time_steps, n_nucleosomes, nucleosome_length, linker_length):
 
 
 if __name__ == "__main__":
-    time_steps = 1_000
-    n_nucleosomes = 10_000
+    time_steps = 100_000
+    n_nucleosomes = 10_000_000
     nucleosome_length = 147
     linker_length = 20
 
-    lengths = main(time_steps, n_nucleosomes, nucleosome_length, linker_length)
-    print(lengths)
+    pool_size = 5
+    n_simulations = 10
+
+    with Pool(processes=pool_size) as pool:
+        lengths = pool.starmap(
+            main,
+            (
+                (time_steps, n_nucleosomes, nucleosome_length, linker_length)
+                for _ in range(n_simulations)
+            ),
+        )
