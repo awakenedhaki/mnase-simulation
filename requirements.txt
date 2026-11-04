@@ -1,3 +1,4 @@
+click==8.5.0
 contourpy==1.4.0
 cycler==0.12.1
 fonttools==4.68.0
