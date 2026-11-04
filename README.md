@@ -1,39 +1,36 @@
 # Micrococcal Nuclease Simulation
 
-This repository contains a Python-based simulation that models the action of Micrococcal Nuclease (MNase) on DNA 11nm fibres. The core components of the simulation include:
+This repository contains a Monte Carlo simulation of Micrococcal Nuclease (MNase) digesting chromatin that still carries its nucleosomes. It renders the result as an agarose gel time course: the classic nucleosome ladder (mono-, di-, tri-nucleosomes…) that collapses toward the ~147 bp core particle as digestion proceeds.
 
-- **Fibre Class:** Represents the 11nm DNA fibre structure, including nucleosomes and linker DNA segments.
+![example gel](docs/gel.png)
 
-- **MNase Class:** Simulates the stochastic cleavage action of MNase on DNA fibres, randomly selecting nucleosomes and linkers for enzymatic digestion.
+## Model
 
-- **Main Simulation Logic:** Orchestrates the simulation over a series of time steps, continuously updating the state of the DNA fibres based on MNase action.
+- **Chromatin template** (`src/chromatin.py`): independent DNA molecules, each laid out as `linker – core – linker – … – core – linker`. Linker lengths are drawn from a normal distribution (`linker_sd=0` gives a perfectly regular array), and any linker can optionally be replaced by a nucleosome-free region.
+- **Digestion** (`src/digest.py`): a tau-leaping Monte Carlo over time steps `dt`. Each step:
+  1. **Endonuclease cuts** form a Poisson process whose rate per bp is `k_linker` in linkers and `k_nuc` (≪ `k_linker`) inside cores.
+  2. **Exonuclease trimming**: every free end is nibbled inward at `k_exo_linker` bp/min in linker DNA. Ends stall at nucleosome borders and then eat into the core at `k_exo_nuc`.
+  3. Fragments shorter than `min_len` are lost as acid-soluble material.
 
-## Key Features:
+  Lanes are aliquots taken from the same digestion at successive times.
+- **Gel** (`src/gel.py`): migration is log-linear in bp, and DNA above ~20 kb sits in the compression zone under the well. Band intensity is proportional to DNA mass (EtBr/SYBR staining), blurred with a Gaussian band width and shown next to a 100 bp ladder.
 
-- **Stochastic Modelling:** Utilizes Monte Carlo methods to realistically simulate the random nature of enzymatic cleavage on DNA.
+## Usage
 
-- **Object-Oriented Approach:** Employs classes to effectively represent complex biological entities and their interactions.
+```bash
+pip install -r requirements.txt
+python main.py --seed 1 --out gel.png
+python main.py --help   # template, kinetics and run options
+```
 
-- **Statistical Analysis:** The output, consisting of the lengths of DNA fibres post-MNase treatment, is suitable for further statistical analysis to understand the distribution and average effects of the nuclease.
+Useful knobs:
+- `--linker-mean` / `--linker-sd` set the nucleosome repeat length and how much the higher-order bands blur.
+- `--k-nuc` controls over-digestion into sub-nucleosomal fragments.
+- `--times` sets the lane sample times.
+- `--style inverted` gives dark bands on white.
 
-## Objectives
+## Tests
 
-* [x] Initialize git repository
-* [x] Create boilerplate files
-  * [x] README.md
-  * [x] .gitignore
-  * [x] main.py
-  * [x] model/\_\_init\_\_.py
-* [x] Define classes
-  * [x] Fibre (data structure)
-    * [x] Define attributes: n_nuclesomes, left_linker, right_linker
-    * [x] Implement constructor (\_\_init\_\_ method)
-    * [x] Implement method to determine number of nucleotides in Fibre
-  * [x] MNase (namespace)
-    * [x] Implement method to select a random nucleosome index
-    * [x] Implement method to select either the left or right linker to cleave
-    * [x] Implement method to cleave the fibre
-* [ ] Implement Visualization
-  * [ ] Install matplotlib
-  * [ ] Define a function to visualize distribution of fibre lengths as a histogram
-  * [ ] Define a function to visualize fibre length over time
+```bash
+pytest
+```
