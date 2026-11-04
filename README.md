@@ -26,7 +26,7 @@ python main.py --help   # template, kinetics and run options
 Useful knobs:
 - `--linker-mean` / `--linker-sd` set the nucleosome repeat length and how much the higher-order bands blur.
 - `--k-nuc` controls over-digestion into sub-nucleosomal fragments.
-- `--times` sets the lane sample times.
+- `--time` sets a lane sample time; repeat it once per lane (e.g. `--time 1 --time 10 --time 100`).
 - `--style inverted` gives dark bands on white.
 
 ## Tests

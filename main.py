@@ -1,10 +1,12 @@
-import argparse
 from multiprocessing import Pool
 
+import click
 import numpy as np
 from tqdm import tqdm
 
 from src import DigestParams, build_template, render_gel, simulate
+
+DEFAULTS = DigestParams()
 
 
 def run_batch(seed, template_kwargs, params, sample_times):
@@ -13,82 +15,94 @@ def run_batch(seed, template_kwargs, params, sample_times):
     return simulate(template, params, sample_times, rng)
 
 
-def main(args):
+def _run_batch_star(job):
+    return run_batch(*job)
+
+
+@click.command(context_settings={"show_default": True})
+# Chromatin template
+@click.option("--n-nucleosomes", type=click.IntRange(min=1), default=100, help="Nucleosomes per DNA molecule.")
+@click.option("--core-length", type=click.IntRange(min=1), default=147, help="DNA wrapped per nucleosome core (bp).")
+@click.option("--linker-mean", type=click.FloatRange(min=0), default=30, help="Mean linker length (bp).")
+@click.option("--linker-sd", type=click.FloatRange(min=0), default=8, help="Linker length standard deviation (bp).")
+@click.option("--nfr-prob", type=click.FloatRange(0, 1), default=0.0, help="Probability a linker is a nucleosome-free region.")
+@click.option("--nfr-length", type=click.IntRange(min=0), default=300, help="Nucleosome-free region length (bp).")
+# Digestion kinetics
+@click.option("--k-linker", type=click.FloatRange(min=0), default=DEFAULTS.k_linker, help="Endonuclease cuts per bp per min in linkers.")
+@click.option("--k-nuc", type=click.FloatRange(min=0), default=DEFAULTS.k_nuc, help="Endonuclease cuts per bp per min in cores.")
+@click.option("--k-exo-linker", type=click.FloatRange(min=0), default=DEFAULTS.k_exo_linker, help="bp trimmed per end per min in linkers.")
+@click.option("--k-exo-nuc", type=click.FloatRange(min=0), default=DEFAULTS.k_exo_nuc, help="bp trimmed per end per min in cores.")
+@click.option("--dt", type=click.FloatRange(min=0, min_open=True), default=DEFAULTS.dt, help="Simulation time step (min).")
+@click.option("--min-len", type=click.IntRange(min=0), default=DEFAULTS.min_len, help="Fragments shorter than this are lost (bp).")
+@click.option("--time", "times", type=click.FloatRange(min=0), multiple=True, default=(1, 3, 10, 30, 100, 300), help="Lane sample time (min); repeat for each lane.")
+# Run
+@click.option("--n-batches", type=click.IntRange(min=1), default=20, help="Independent batches, run in parallel.")
+@click.option("--chains-per-batch", type=click.IntRange(min=1), default=100, help="DNA molecules per batch.")
+@click.option("--processes", type=click.IntRange(min=1), default=None, help="Worker processes [default: all CPUs].")
+@click.option("--seed", type=int, default=None, help="Random seed for reproducibility.")
+@click.option("--style", type=click.Choice(["uv", "inverted"]), default="uv", help="Bright bands on black, or dark bands on white.")
+@click.option("--out", type=click.Path(dir_okay=False, writable=True), default="gel.png", help="Output image path.")
+def main(
+    n_nucleosomes,
+    core_length,
+    linker_mean,
+    linker_sd,
+    nfr_prob,
+    nfr_length,
+    k_linker,
+    k_nuc,
+    k_exo_linker,
+    k_exo_nuc,
+    dt,
+    min_len,
+    times,
+    n_batches,
+    chains_per_batch,
+    processes,
+    seed,
+    style,
+    out,
+):
+    """Monte Carlo simulation of MNase digestion of chromatin, rendered as an
+    agarose gel time course."""
     template_kwargs = {
-        "n_nucleosomes": args.n_nucleosomes,
-        "n_chains": args.chains_per_batch,
-        "core_length": args.core_length,
-        "linker_mean": args.linker_mean,
-        "linker_sd": args.linker_sd,
-        "nfr_prob": args.nfr_prob,
-        "nfr_length": args.nfr_length,
+        "n_nucleosomes": n_nucleosomes,
+        "n_chains": chains_per_batch,
+        "core_length": core_length,
+        "linker_mean": linker_mean,
+        "linker_sd": linker_sd,
+        "nfr_prob": nfr_prob,
+        "nfr_length": nfr_length,
     }
     params = DigestParams(
-        k_linker=args.k_linker,
-        k_nuc=args.k_nuc,
-        k_exo_linker=args.k_exo_linker,
-        k_exo_nuc=args.k_exo_nuc,
-        dt=args.dt,
-        min_len=args.min_len,
+        k_linker=k_linker,
+        k_nuc=k_nuc,
+        k_exo_linker=k_exo_linker,
+        k_exo_nuc=k_exo_nuc,
+        dt=dt,
+        min_len=min_len,
     )
-    seeds = np.random.SeedSequence(args.seed).spawn(args.n_batches)
+    seeds = np.random.SeedSequence(seed).spawn(n_batches)
 
-    with Pool(processes=args.processes) as pool:
+    with Pool(processes=processes) as pool:
         batches = list(
             tqdm(
                 pool.imap_unordered(
                     _run_batch_star,
-                    ((seed, template_kwargs, params, args.times) for seed in seeds),
+                    ((s, template_kwargs, params, times) for s in seeds),
                 ),
-                total=args.n_batches,
+                total=n_batches,
                 desc="Digesting",
             )
         )
 
     lanes = {
         f"{t:g} min": np.concatenate([batch[t] for batch in batches])
-        for t in args.times
+        for t in times
     }
-    render_gel(lanes, args.out, style=args.style, title="MNase digestion time course")
-    print(f"Saved gel to {args.out}")
-
-
-def _run_batch_star(job):
-    return run_batch(*job)
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Monte Carlo simulation of MNase digestion of chromatin, "
-        "rendered as an agarose gel time course."
-    )
-    template = parser.add_argument_group("chromatin template")
-    template.add_argument("--n-nucleosomes", type=int, default=100, help="nucleosomes per DNA molecule")
-    template.add_argument("--core-length", type=int, default=147)
-    template.add_argument("--linker-mean", type=float, default=30)
-    template.add_argument("--linker-sd", type=float, default=8)
-    template.add_argument("--nfr-prob", type=float, default=0.0, help="probability a linker is a nucleosome-free region")
-    template.add_argument("--nfr-length", type=int, default=300)
-
-    kinetics = parser.add_argument_group("digestion kinetics")
-    defaults = DigestParams()
-    kinetics.add_argument("--k-linker", type=float, default=defaults.k_linker, help="endonuclease cuts per bp per min in linkers")
-    kinetics.add_argument("--k-nuc", type=float, default=defaults.k_nuc, help="endonuclease cuts per bp per min in cores")
-    kinetics.add_argument("--k-exo-linker", type=float, default=defaults.k_exo_linker, help="bp trimmed per end per min in linkers")
-    kinetics.add_argument("--k-exo-nuc", type=float, default=defaults.k_exo_nuc, help="bp trimmed per end per min in cores")
-    kinetics.add_argument("--dt", type=float, default=defaults.dt)
-    kinetics.add_argument("--min-len", type=int, default=defaults.min_len)
-    kinetics.add_argument("--times", type=float, nargs="+", default=[1, 3, 10, 30, 100, 300], help="lane sample times (min)")
-
-    run = parser.add_argument_group("run")
-    run.add_argument("--n-batches", type=int, default=20)
-    run.add_argument("--chains-per-batch", type=int, default=100)
-    run.add_argument("--processes", type=int, default=None, help="defaults to all CPUs")
-    run.add_argument("--seed", type=int, default=None)
-    run.add_argument("--style", choices=["uv", "inverted"], default="uv")
-    run.add_argument("--out", default="gel.png")
-    return parser.parse_args()
+    render_gel(lanes, out, style=style, title="MNase digestion time course")
+    click.echo(f"Saved gel to {out}")
 
 
 if __name__ == "__main__":
-    main(parse_args())
+    main()
